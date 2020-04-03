@@ -1,12 +1,28 @@
 <template>
     <div id="app">
-        <!-- <keep-alive include="presents-house"> -->
-        <router-view />
-        <!-- </keep-alive> -->
+        <transition :name="transitionName">
+            <router-view class="router-view-c" ref="routerView" />
+        </transition>
     </div>
 </template>
 <script>
 export default {
+    data() {
+        return {
+            transitionName: "normal"
+        };
+    },
+    watch: {
+        $route(to, from) {
+            if (to.query["stack"] === "forward") {
+                this.transitionName = "forward";
+            } else if (to.query["stack"] === "back") {
+                this.transitionName = "back";
+            } else {
+                this.transitionName = "normal";
+            }
+        }
+    },
     created() {
         // this.$api.jssdk({url: window.location.href.split("#")[0]}).then(
         //     res => {
@@ -45,11 +61,41 @@ html {
 }
 
 body {
+    min-height: 100vh;
     background-color: #f8f8f8;
     -webkit-font-smoothing: antialiased;
 }
 
 #app {
     -webkit-overflow-scrolling: touch;
+}
+.router-view-c {
+    position: absolute;
+    transition: opacity 0.5s, transform 0.5s;
+    width: 100%;
+}
+
+.forward-enter,
+.back-leave-active {
+    opacity: 0.5;
+    transform: translateX(100%);
+    -webkit-transform: translateX(100%);
+}
+
+.forward-leave-active,
+.back-enter {
+    opacity: 0.5;
+    transform: translateX(-100%);
+    -webkit-transform: translateX(-100%);
+}
+
+.normal-enter-active,
+.normal-leave-active {
+    transition: opacity 0.1s;
+}
+
+.normal-enter,
+.normal-leave-to {
+    opacity: 0;
 }
 </style>
